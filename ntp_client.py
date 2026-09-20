@@ -5,7 +5,8 @@ The program sends a standard 48-byte NTP request over UDP port 123,
 parses the server response and displays the NTP time, local time,
 local UDP source port, round-trip delay and estimated clock offset.
 
-Copyright 2026 Ib Helmer Nielsen\nSPDX-License-Identifier: Apache-2.0
+Copyright 2026 Ib Helmer Nielsen
+SPDX-License-Identifier: Apache-2.0
 """
 
 from __future__ import annotations
