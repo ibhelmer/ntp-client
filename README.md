@@ -98,4 +98,6 @@ Det gør projektet velegnet som et simpelt undervisningseksempel på UDP, applik
 
 ## Licens
 
-Projektet er udgivet under **Apache License 2.0**. Se filen [LICENSE](LICENSE).
+Copyright © 2026 **Ib Helmer Nielsen**.
+
+Projektet er udgivet under **Apache License 2.0**. Se filen [LICENSE](LICENSE). Se også [NOTICE](NOTICE) for copyright-oplysninger.
