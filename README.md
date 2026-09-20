@@ -7,6 +7,8 @@ Programmet sender en almindelig NTP-forespørgsel over UDP port 123 og viser:
 - NTP-tid i UTC
 - lokal tid
 - NTP-serverens IP-adresse
+- den lokale udgående UDP-kildeport
+- destinationens UDP-port 123
 - stratum
 - round-trip delay
 - estimeret forskel mellem systemuret og NTP-serveren
@@ -47,6 +49,22 @@ time.google.com
 dk.pool.ntp.org
 ```
 
+## UDP-porte
+
+NTP-serveren kontaktes på den velkendte destinationsport:
+
+```
+UDP/123
+```
+
+Klienten bruger normalt ikke UDP/123 som lokal kildeport. Operativsystemet vælger automatisk en ledig **ephemeral UDP-port** til forespørgslen. Programmet aflæser denne port fra socketen med:
+
+```python
+sock.getsockname()[1]
+```
+
+Den faktiske lokale kildeport vises i GUI'en som **Udgående UDP-kildeport**. Portnummeret kan derfor ændre sig fra forespørgsel til forespørgsel.
+
 ## Hvordan virker det?
 
 Klienten sender en 48-byte NTP-pakke med:
@@ -76,4 +94,8 @@ hvor:
 
 Programmet ændrer ikke computerens systemur. Det måler kun tiden og viser den estimerede afvigelse.
 
-Det gør projektet velegnet som et simpelt undervisningseksempel på UDP, applikationslagsprotokoller og tidsprotokollen NTP.
+Det gør projektet velegnet som et simpelt undervisningseksempel på UDP, applikationslagsprotokoller, ephemeral ports og tidsprotokollen NTP.
+
+## Licens
+
+Projektet er udgivet under **Apache License 2.0**. Se filen [LICENSE](LICENSE).
