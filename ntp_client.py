@@ -3,7 +3,9 @@ Simple NTP client with a Tkinter GUI.
 
 The program sends a standard 48-byte NTP request over UDP port 123,
 parses the server response and displays the NTP time, local time,
-round-trip delay and estimated clock offset.
+local UDP source port, round-trip delay and estimated clock offset.
+
+SPDX-License-Identifier: Apache-2.0
 """
 
 from __future__ import annotations
@@ -30,6 +32,7 @@ DEFAULT_TIMEOUT = 3.0
 class NTPResult:
     server: str
     ip_address: str
+    local_udp_port: int
     stratum: int
     version: int
     mode: int
@@ -70,6 +73,11 @@ def query_ntp(server: str, timeout: float = DEFAULT_TIMEOUT) -> NTPResult:
 
         t1 = time.time()
         sock.sendto(request, sockaddr)
+
+        # After the first send, the OS has selected/bound the ephemeral
+        # local UDP source port used for this NTP request.
+        local_udp_port = sock.getsockname()[1]
+
         response, remote_address = sock.recvfrom(512)
         t4 = time.time()
 
@@ -103,6 +111,7 @@ def query_ntp(server: str, timeout: float = DEFAULT_TIMEOUT) -> NTPResult:
     return NTPResult(
         server=server,
         ip_address=remote_address[0],
+        local_udp_port=local_udp_port,
         stratum=stratum,
         version=version,
         mode=mode,
@@ -126,6 +135,7 @@ class NTPClientGUI:
         self.utc_var = tk.StringVar(value="-")
         self.local_var = tk.StringVar(value="-")
         self.ip_var = tk.StringVar(value="-")
+        self.source_port_var = tk.StringVar(value="-")
         self.stratum_var = tk.StringVar(value="-")
         self.delay_var = tk.StringVar(value="-")
         self.offset_var = tk.StringVar(value="-")
@@ -156,6 +166,8 @@ class NTPClientGUI:
             ("UTC fra NTP:", self.utc_var),
             ("Lokal tid:", self.local_var),
             ("Server-IP:", self.ip_var),
+            ("Udgående UDP-kildeport:", self.source_port_var),
+            ("Destination UDP-port:", tk.StringVar(value=str(NTP_PORT))),
             ("Stratum:", self.stratum_var),
             ("Round-trip:", self.delay_var),
             ("Ur-afvigelse:", self.offset_var),
@@ -239,6 +251,7 @@ class NTPClientGUI:
         self.utc_var.set(utc_text)
         self.local_var.set(local_text)
         self.ip_var.set(result.ip_address)
+        self.source_port_var.set(f"UDP/{result.local_udp_port}")
         self.stratum_var.set(f"{result.stratum} (NTP v{result.version}, mode {result.mode})")
         self.delay_var.set(f"{result.round_trip_ms:.2f} ms")
         self.offset_var.set(f"{result.clock_offset_ms:+.2f} ms")
